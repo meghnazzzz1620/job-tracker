@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://job-tracker-backend.onrender.com",
+  baseURL: "job-tracker-production-fe66.up.railway.app",
 });
 
 export const getJobs = () => api.get("/jobs");
