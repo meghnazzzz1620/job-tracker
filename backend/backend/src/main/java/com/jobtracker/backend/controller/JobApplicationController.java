@@ -1,51 +1,50 @@
 package com.jobtracker.backend.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
+
 import com.jobtracker.backend.model.JobApplication;
 import com.jobtracker.backend.repository.JobApplicationRepository;
-import com.jobtracker.backend.dto.UpdateJobStatusRequest;
 
 @RestController
 @RequestMapping("/jobs")
-@CrossOrigin(origins = "http://localhost:5173")
 public class JobApplicationController {
 
-    private final JobApplicationRepository repo;
+    private final JobApplicationRepository repository;
 
-    public JobApplicationController(JobApplicationRepository repo) {
-        this.repo = repo;
+    public JobApplicationController(JobApplicationRepository repository) {
+        this.repository = repository;
     }
 
+    // GET ALL JOBS
     @GetMapping
-    public Iterable<JobApplication> getAllJobs() {
-        return repo.findAll();
+    public List<JobApplication> getAllJobs() {
+        return repository.findAll();
     }
 
+    // ADD JOB
     @PostMapping
-    public JobApplication createJob(@RequestBody JobApplication job) {
-        return repo.save(job);
+    public JobApplication addJob(@RequestBody JobApplication job) {
+        return repository.save(job);
     }
 
+    // UPDATE STATUS
     @PutMapping("/{id}/status")
-    public JobApplication updateJobStatus(
+    public JobApplication updateStatus(
             @PathVariable Long id,
-            @RequestBody UpdateJobStatusRequest request) {
-        JobApplication job = repo.findById(id)
+            @RequestBody JobApplication updatedJob) {
+
+        JobApplication job = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Job not found"));
 
-        System.out.println("REQUEST STATUS = " + request.getStatus());
-
-        job.setStatus(request.getStatus());
-
-        JobApplication saved = repo.save(job);
-
-        System.out.println("SAVED STATUS = " + saved.getStatus());
-
-        return saved;
+        job.setStatus(updatedJob.getStatus());
+        return repository.save(job);
     }
 
+    // DELETE JOB
     @DeleteMapping("/{id}")
     public void deleteJob(@PathVariable Long id) {
-        repo.deleteById(id);
+        repository.deleteById(id);
     }
 }

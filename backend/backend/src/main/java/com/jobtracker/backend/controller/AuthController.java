@@ -1,12 +1,12 @@
 package com.jobtracker.backend.controller;
 
 import org.springframework.web.bind.annotation.*;
+
 import com.jobtracker.backend.model.User;
 import com.jobtracker.backend.repository.UserRepository;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -19,10 +19,10 @@ public class AuthController {
     @PostMapping("/signup")
     public String signup(@RequestBody User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "EMAIL_EXISTS";
+            return "Email already exists";
         }
         userRepository.save(user);
-        return "SIGNUP_SUCCESS";
+        return "User registered";
     }
 
     // LOGIN
@@ -31,6 +31,6 @@ public class AuthController {
         return userRepository.findByEmail(user.getEmail())
                 .filter(u -> u.getPassword().equals(user.getPassword()))
                 .map(u -> "LOGIN_SUCCESS")
-                .orElse("INVALID_CREDENTIALS");
+                .orElse("Invalid credentials");
     }
 }
