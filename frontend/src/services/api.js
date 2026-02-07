@@ -1,14 +1,13 @@
 import axios from "axios";
 
-export const api = axios.create({
-  baseURL: "job-tracker-production-fe66.up.railway.app",
+const api = axios.create({
+  baseURL: "https://job-tracker-production-fe66.up.railway.app",
 });
 
 export const getJobs = () => api.get("/jobs");
-
 export const createJob = (job) => api.post("/jobs", job);
+export const updateJobStatus = (id, status) =>
+  api.put(`/jobs/${id}/status`, { status });
+export const deleteJob = (id) => api.delete(`/jobs/${id}`);
 
-export const updateJobStatus = (jobId, status) =>
-  api.put(`/jobs/${jobId}/status`, { status });
-
-export const deleteJob = (jobId) => api.delete(`/jobs/${jobId}`);
+export default api;

@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8083";
+// ✅ USE RAILWAY BACKEND URL
+const API_BASE_URL = "https://job-tracker-production-fe66.up.railway.app";
 
 export const signup = (user) => {
   return axios.post(`${API_BASE_URL}/auth/signup`, user);
