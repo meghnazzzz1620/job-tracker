@@ -14,6 +14,7 @@ import {
 
 export default function Dashboard() {
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("newest");
@@ -26,8 +27,12 @@ export default function Dashboard() {
   }, [darkMode]);
 
   const loadJobs = async () => {
-    const res = await getJobs();
-    setJobs(res.data);
+    try {
+      const res = await getJobs();
+      setJobs(res.data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -90,114 +95,144 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {/* STATS */}
-      <div style={statsGrid}>
-        {Object.entries(stats).map(([label, value], i) => (
-          <div
-            key={label}
-            style={{
-              ...glassCard,
-              background: gradientMap[label],
-            }}
-            className="hover-card"
-          >
-            <h1>{value}</h1>
-            <p>{label}</p>
-          </div>
-        ))}
-      </div>
+      {/* LOADING STATE */}
+      {loading && (
+        <div style={loadingBox}>
+          <div className="spinner" />
+          <p>Loading applications...</p>
+        </div>
+      )}
 
-      {/* PIE CHART */}
-      <div style={{ ...glassBox, background: theme.glass }}>
-        <h3>Status Distribution</h3>
-        <ResponsiveContainer width="100%" height={260}>
-          <PieChart>
-            <Pie data={chartData} dataKey="value" label>
-              {chartData.map((_, i) => (
-                <Cell key={i} fill={COLORS[i]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* FILTER BAR */}
-      <div style={filterBar}>
-        <input
-          placeholder="Search company or role..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={input}
-        />
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={input}
-        >
-          <option value="All">All</option>
-          <option>Applied</option>
-          <option>Interview</option>
-          <option>Offer</option>
-          <option>Rejected</option>
-        </select>
-
-        <select
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          style={input}
-        >
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-        </select>
-      </div>
-
-      {/* JOB CARDS */}
-      {filteredJobs.map((job) => (
-        <div
-          key={job.jobId}
-          style={{ ...glassRow, background: theme.glass }}
-          className="hover-card"
-        >
-          <div>
-            <h3>{job.company}</h3>
-            <p>{job.role}</p>
-            <small>Applied on {job.appliedDate}</small>
+      {!loading && (
+        <>
+          {/* STATS */}
+          <div style={statsGrid}>
+            {Object.entries(stats).map(([label, value], i) => (
+              <div
+                key={label}
+                style={{
+                  ...glassCard,
+                  background: gradientMap[label],
+                }}
+                className="hover-card"
+              >
+                <h1>{value}</h1>
+                <p>{label}</p>
+              </div>
+            ))}
           </div>
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          {/* PIE CHART */}
+          <div style={{ ...glassBox, background: theme.glass }}>
+            <h3>Status Distribution</h3>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={chartData} dataKey="value" label>
+                  {chartData.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* FILTER BAR */}
+          <div style={filterBar}>
+            <input
+              placeholder="Search company or role..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={input}
+            />
+
             <select
-              value={job.status}
-              onChange={(e) =>
-                handleStatusChange(job.jobId, e.target.value)
-              }
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
               style={input}
             >
+              <option value="All">All</option>
               <option>Applied</option>
               <option>Interview</option>
               <option>Offer</option>
               <option>Rejected</option>
             </select>
 
-            <button
-              onClick={() => handleDelete(job.jobId)}
-              style={deleteBtn}
+            <select
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value)}
+              style={input}
             >
-              Delete
-            </button>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+            </select>
           </div>
-        </div>
-      ))}
 
-      {/* HOVER ANIMATIONS */}
+          {/* EMPTY STATE */}
+          {filteredJobs.length === 0 ? (
+            <div style={emptyBox}>
+              <h3>No applications found</h3>
+              <p>Try adding a job or adjusting filters.</p>
+            </div>
+          ) : (
+            filteredJobs.map((job) => (
+              <div
+                key={job.jobId}
+                style={{ ...glassRow, background: theme.glass }}
+                className="hover-card"
+              >
+                <div>
+                  <h3>{job.company}</h3>
+                  <p>{job.role}</p>
+                  <small>Applied on {job.appliedDate}</small>
+                </div>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <select
+                    value={job.status}
+                    onChange={(e) =>
+                      handleStatusChange(job.jobId, e.target.value)
+                    }
+                    style={input}
+                  >
+                    <option>Applied</option>
+                    <option>Interview</option>
+                    <option>Offer</option>
+                    <option>Rejected</option>
+                  </select>
+
+                  <button
+                    onClick={() => handleDelete(job.jobId)}
+                    style={deleteBtn}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </>
+      )}
+
+      {/* HOVER + SPINNER */}
       <style>{`
         .hover-card {
           transition: all 0.35s ease;
         }
         .hover-card:hover {
-          transform: translateY(-10px) scale(1.02);
-          box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 25px 60px rgba(0,0,0,0.45);
+        }
+        .spinner {
+          width: 42px;
+          height: 42px;
+          border: 4px solid rgba(255,255,255,0.3);
+          border-top: 4px solid #3b82f6;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
@@ -296,4 +331,18 @@ const deleteBtn = {
   padding: "8px 14px",
   borderRadius: "10px",
   cursor: "pointer",
+};
+
+const loadingBox = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: "14px",
+  marginTop: "80px",
+};
+
+const emptyBox = {
+  textAlign: "center",
+  padding: "60px",
+  opacity: 0.8,
 };
