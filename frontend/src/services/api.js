@@ -1,28 +1,24 @@
 import axios from "axios";
 
-// ✅ MUST BE YOUR RAILWAY BACKEND URL
-const API_BASE_URL = "https://job-tracker-production-fe66.up.railway.app";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-/* -------- JOB APIs -------- */
+/* ---------------- JOB APIs ---------------- */
 
-export const getJobs = () => {
-  return api.get("/jobs");
-};
+export const getJobs = () => api.get("/jobs");
 
-export const createJob = (job) => {
-  return api.post("/jobs", job);
-};
+export const createJob = (job) => api.post("/jobs", job);
 
-export const updateJobStatus = (jobId, status) => {
-  return api.put(`/jobs/${jobId}/status`, { status });
-};
+export const updateJobStatus = (jobId, status) =>
+  api.put(`/jobs/${jobId}/status`, { status });
 
-export const deleteJob = (jobId) => {
-  return api.delete(`/jobs/${jobId}`);
-};
+export const deleteJob = (jobId) => api.delete(`/jobs/${jobId}`);
 
-export default api;
+/* ---------------- AUTH APIs ---------------- */
+
+export const signup = (user) => api.post("/auth/signup", user);
+
+export const login = (user) => api.post("/auth/login", user);
