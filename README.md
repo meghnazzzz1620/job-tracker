@@ -47,3 +47,11 @@ A production-ready job application tracking platform built using React, Spring B
 - Easy to add JWT authentication and caching (Redis)
 
 ## 📂 Project Structure
+job-tracker/
+├── frontend/ # React application
+├── backend/ # Spring Boot application
+└── README.md
+
+
+## 👩‍💻 Author
+Meghna Pradhan
